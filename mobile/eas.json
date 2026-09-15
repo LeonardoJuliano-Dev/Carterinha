@@ -9,7 +9,6 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_GEMINI_API_KEY": "",
         "GRADLE_OPTS": "-Djava.net.preferIPv4Stack=true -Xmx4096m"
       }
     },
