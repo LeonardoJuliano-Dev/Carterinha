@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Carterinha",
+    "slug": "carterinha",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0F19"
+    },
+    "updates": {
+      "enabled": false,
+      "checkAutomatically": "NEVER"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "mz.carterinha.app"
+    },
+    "android": {
+      "package": "mz.carterinha.app",
+      "versionCode": 3,
+      "permissions": [
+        "RECEIVE_SMS",
+        "READ_SMS",
+        "POST_NOTIFICATIONS",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0F19"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-local-authentication",
+      "./plugins/withAndroidNotificationListener"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9c0204b3-8e07-4d96-96da-a980d9232134"
+      }
+    }
+  }
+}

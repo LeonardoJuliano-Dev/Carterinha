@@ -1,0 +1,71 @@
+=============================================================================
+                          SOBRE O SISTEMA: CARTERINHA
+=============================================================================
+
+1. O QUE É EXATAMENTE ESTE SISTEMA?
+A "Carterinha" é uma aplicação móvel de finanças pessoais "Local-First". O seu principal objetivo é ajudar os utilizadores a gerir o seu dinheiro de forma inteligente, automática e privada.
+
+O sistema baseia-se na regra de orçamentação "50/30/20" (50% para Necessidades, 30% para Desejos/Lazer, 20% para Poupanças/Dívidas).
+
+Principais Funcionalidades:
+- Interceção Automática de Gastos: A app consegue ler as notificações e SMS recebidas de bancos e carteiras móveis (como M-Pesa, e-Mola, BIM, Access Bank) e registar automaticamente a despesa sem o utilizador ter de digitar nada.
+- Deteção Inteligente de Salário (Janela 25 a 5): Quando entra dinheiro na conta bancária selecionada como conta salário entre os dias 25 e 5, o sistema pergunta nos primeiros 2 meses se o valor recebido é o salário e se pretende atualizar o valor base. A partir do 3º mês, a atualização torna-se 100% automática.
+- Lembretes Automáticos de Despesas Fixas: O sistema calcula as datas de vencimento das despesas fixas ativas e notifica o utilizador com exatamente 3 dias de antecedência para evitar esquecimentos.
+- Notificações Inteligentes de Metas e Pontos-Chave: O sistema emite alertas para metas paradas há muito tempo e metas a chegar ao fim do prazo. Para as metas a chegar ao fim, emite a notificação "Consulta como alcançar essa meta com o consultor", permitindo ao utilizador clicar e ser levado diretamente para o Consultor IA com a pergunta já preenchida.
+- Consultor Financeiro de Inteligência Artificial (IA): Integrado com o Google Gemini, o sistema analisa os padrões de gastos, critica compras impulsivas e sugere formas de poupar. A IA funciona localmente no telemóvel, comunicando diretamente com a API do Google (ou através de um backend Python).
+- Local-First e Privacidade: Todos os dados (transações, saldo, metas) são guardados localmente no telemóvel (via SQLite / AsyncStorage). Não existe uma base de dados centralizada na nuvem que guarde as despesas do utilizador, garantindo total privacidade.
+- Gestão de Metas: Permite criar objetivos (ex: comprar um carro) e visualizar o progresso.
+
+-----------------------------------------------------------------------------
+
+2. COMO FUNCIONA A ARQUITETURA?
+O projeto está dividido em duas partes principais:
+
+A) MOBILE (A Aplicação Principal)
+- Desenvolvida em React Native e Expo (TypeScript).
+- Gere toda a interface gráfica, a base de dados local, e possui tarefas em segundo plano (Headless JS) para intercetar notificações no Android.
+- Consegue ligar-se diretamente à API do Google Gemini se o utilizador colocar a sua chave nas configurações.
+
+B) BACKEND (Opcional - Microserviço)
+- Desenvolvido em Python (FastAPI).
+- Serve como um servidor local ou remoto para processar pedidos avançados de IA (como extrair dados de faturas ou conversas complexas), caso a app não esteja a usar o modo "IA Direta".
+
+-----------------------------------------------------------------------------
+
+3. QUAIS SÃO AS DEPENDÊNCIAS (O QUE É PRECISO INSTALAR)?
+
+Para alguém descarregar este código do GitHub e conseguir executá-lo no seu computador, precisará de ter o seguinte instalado:
+
+Para a App Mobile (Obrigatório):
+1. Node.js (versão 18 ou superior) - Para correr o ambiente JavaScript.
+2. Git - Para clonar o repositório.
+3. Expo CLI - Para correr a aplicação (instalado via npm).
+4. Uma Conta Expo (opcional, mas recomendado para compilar o APK).
+5. Telemóvel Android ou Emulador (Android Studio) para testar a app.
+
+Para o Backend Python (Opcional):
+1. Python (versão 3.9 ou superior).
+2. Pip (Gestor de pacotes Python).
+
+-----------------------------------------------------------------------------
+
+4. COMO EXECUTAR O PROJETO DO ZERO?
+
+Passo 1: Iniciar a App Mobile
+1. Abrir o terminal na pasta raiz do projeto.
+2. Entrar na pasta mobile: `cd mobile`
+3. Instalar as dependências: `npm install`
+4. Iniciar o servidor Expo: `npx expo start` ou `npm start`
+5. Pressionar a tecla 'a' no terminal para abrir no emulador Android, ou ler o código QR com a app Expo Go no telemóvel.
+
+Passo 2: Iniciar o Backend Python (Se quiser usar o modo servidor IA)
+1. Entrar na pasta backend: `cd backend`
+2. Criar um ambiente virtual: `python -m venv venv`
+3. Ativar o ambiente: 
+   - No Windows: `venv\Scripts\activate`
+   - No Mac/Linux: `source venv/bin/activate`
+4. Instalar as dependências: `pip install -r requirements.txt`
+5. Adicionar a chave da API do Gemini no ficheiro `.env` dentro do backend.
+6. Correr o servidor: `python run.py` (ou usando uvicorn).
+
+-----------------------------------------------------------------------------

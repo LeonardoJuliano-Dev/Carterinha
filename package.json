@@ -1,0 +1,16 @@
+{
+  "name": "carterinhas",
+  "version": "1.0.0",
+  "description": "Sistema de Finanças Pessoais Local-First com IA",
+  "main": "mobile/App.tsx",
+  "scripts": {
+    "start": "npm --prefix mobile start",
+    "mobile": "npm --prefix mobile start",
+    "web": "npm --prefix mobile run web",
+    "backend": "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload",
+    "test": "python -m pytest backend/tests"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6"
+  }
+}

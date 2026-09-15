@@ -1,0 +1,52 @@
+{
+  "name": "carterinha-mobile",
+  "version": "1.0.0",
+  "description": "Carterinha - Sistema de Finanças Pessoais Local-First com Expo SQLite e IA",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./scripts/start-lan.js",
+    "lan": "node ./scripts/start-lan.js",
+    "tunnel": "expo start --tunnel -c",
+    "clear": "node ./scripts/start-lan.js",
+    "web": "expo start --web",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "build:apk": "cross-env EAS_NO_VCS=1 npx eas-cli build -p android --profile preview"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~3.2.3",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/netinfo": "11.3.1",
+    "@react-native/assets-registry": "^0.74.87",
+    "@react-native/js-polyfills": "^0.74.87",
+    "@react-native/normalize-colors": "^0.74.87",
+    "@react-native/virtualized-lists": "^0.74.87",
+    "expo": "~51.0.0",
+    "expo-blur": "~13.0.2",
+    "expo-crypto": "~13.0.2",
+    "expo-document-picker": "~12.0.2",
+    "expo-file-system": "~17.0.1",
+    "expo-image-picker": "~15.1.0",
+    "expo-linear-gradient": "~13.0.2",
+    "expo-local-authentication": "~14.0.1",
+    "expo-secure-store": "~13.0.2",
+    "expo-sharing": "~12.0.1",
+    "expo-sqlite": "~14.0.0",
+    "expo-status-bar": "~1.12.1",
+    "nativewind": "^2.0.11",
+    "react": "18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "0.74.5",
+    "react-native-android-notification-listener": "^5.0.1",
+    "react-native-web": "^0.19.13",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "cross-env": "^10.1.0",
+    "tailwindcss": "3.3.2",
+    "typescript": "~5.3.3"
+  },
+  "private": true
+}
