@@ -17,6 +17,11 @@ import { useFinanceStore } from './src/stores/financeStore';
 import { startSyncQueueService } from './src/services/syncQueueService';
 import { lightTheme, darkTheme, getTheme } from './src/theme/colors';
 import { useTranslation } from './src/i18n/useTranslation';
+import {
+  setupNotificationChannel,
+  requestLocalNotificationPermission,
+  registerNotificationResponseListener,
+} from './src/services/localNotificationService';
 
 // Telas Principais
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
@@ -70,6 +75,27 @@ export default function App() {
   useEffect(() => {
     initialize();
     startSyncQueueService();
+
+    // Inicializar canal de notificações Android e solicitar permissão
+    setupNotificationChannel();
+    requestLocalNotificationPermission();
+  }, []);
+
+  // Listener para toque em notificações Android (navegar para o ecrã correto)
+  useEffect(() => {
+    const cleanup = registerNotificationResponseListener((actionType, actionPayload) => {
+      if (!actionType || actionType === 'none') return;
+      if (actionType === 'navigate_advisor') {
+        setAdvisorInitialPrompt(actionPayload);
+        setSubScreen('advisor');
+      } else if (actionType === 'navigate_goals') {
+        setSubScreen('none');
+        setActiveTab('goals');
+      } else if (actionType === 'navigate_fixed_expenses') {
+        setSubScreen('fixed_expenses');
+      }
+    });
+    return cleanup;
   }, []);
 
   // Gestão unificada e fluida do botão "Voltar" (Hardware Back do Android e gestos)

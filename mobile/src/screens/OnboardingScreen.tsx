@@ -48,6 +48,7 @@ export const OnboardingScreen: React.FC = () => {
   const [salaryPayDay, setSalaryPayDay] = useState('25');
   const [salaryFrequency, setSalaryFrequency] = useState<'monthly' | 'biweekly' | 'bimonthly'>('monthly');
   const [salaryAccountSource, setSalaryAccountSource] = useState('Millennium BIM');
+  const [customSalaryAccountSource, setCustomSalaryAccountSource] = useState('');
 
   // Modais de Dropdown para seleção
   const [langModalVisible, setLangModalVisible] = useState(false);
@@ -123,7 +124,7 @@ export const OnboardingScreen: React.FC = () => {
         initialBalance: parseFloat(initialBalance.replace(',', '.')) || 0,
         salaryPayDay: parseInt(salaryPayDay, 10) || 25,
         salaryFrequency,
-        salaryAccountSource,
+        salaryAccountSource: salaryAccountSource === t.otherBank ? (customSalaryAccountSource.trim() || t.otherBank) : salaryAccountSource,
         split: { needsPercent: nP, wantsPercent: wP, savingsPercent: sP },
         language,
         currency,
@@ -382,7 +383,7 @@ export const OnboardingScreen: React.FC = () => {
               Conta Salário (Deteção de 25 a 5)
             </Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-              {['Millennium BIM', 'M-Pesa', 'e-Mola', 'Access Bank'].map((bank) => (
+              {['Millennium BIM', 'M-Pesa', 'e-Mola', 'Access Bank', t.otherBank].map((bank) => (
                 <TouchableOpacity
                   key={bank}
                   style={[
@@ -410,6 +411,19 @@ export const OnboardingScreen: React.FC = () => {
                 </TouchableOpacity>
               ))}
             </View>
+
+            {salaryAccountSource === t.otherBank && (
+              <TextInput
+                style={[
+                  styles.input,
+                  { backgroundColor: colors.inputBg, color: colors.textPrimary, borderColor: colors.border, marginBottom: 14 },
+                ]}
+                placeholder={t.enterBankName}
+                placeholderTextColor={colors.textMuted}
+                value={customSalaryAccountSource}
+                onChangeText={setCustomSalaryAccountSource}
+              />
+            )}
 
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
               {t.initialBalanceOptional} ({currencySymbol})

@@ -48,6 +48,7 @@ export async function headlessNotificationListener(data?: { notification: string
       typeof data.notification === 'string' ? JSON.parse(data.notification) : data.notification;
 
     const sender = (raw.title || raw.subText || '').trim();
+    const appPackage = (raw.app || '').trim();
     let messageText = (raw.bigText || raw.text || '').trim();
 
     // Se o texto principal estiver vazio mas existirem mensagens agrupadas (típico em SMS/WhatsApp)
@@ -59,15 +60,13 @@ export async function headlessNotificationListener(data?: { notification: string
     if (!messageText) return;
 
     // ── FILTRO DE FONTE ──────────────────────────────────────────────────────────
-    // Importado de forma lazy para não bloquear o registo do módulo nativo.
-    // Apenas notificações cujo remetente conste na allowlist configurada pelo
-    // utilizador (bancos e agentes móveis) são processadas. WhatsApp, Gmail,
-    // redes sociais, etc. são automaticamente descartados.
+    // Passa sender, appPackage e messageText para maximizar a deteção.
+    // Agora o filtro procura keywords no título, no package name da app de origem,
+    // e no conteúdo da mensagem — capturando notificações onde o banco só aparece
+    // no corpo (ex: "BIM: Crédito de 45,000.00MT...") ou no package name
+    // (ex: "com.vodacom.mpesa").
     const { isSourceAllowed } = require('./notificationSources');
-    if (!isSourceAllowed(sender)) {
-      console.log(
-        `[HeadlessListener] Notificação ignorada — remetente não autorizado: "${sender}"`
-      );
+    if (!isSourceAllowed(sender, appPackage, messageText)) {
       return;
     }
     // ─────────────────────────────────────────────────────────────────────────────

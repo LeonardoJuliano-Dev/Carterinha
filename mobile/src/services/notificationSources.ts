@@ -103,18 +103,32 @@ export async function saveNotificationSources(sources: NotificationSource[]): Pr
  * Verifica se um dado remetente pertence a alguma fonte ativa.
  * Usado pelo headless listener para filtrar notificações não financeiras (ex: WhatsApp).
  *
- * @param sender - O campo title/subText da notificação Android (case-insensitive)
+ * Analisa múltiplas fontes de informação para maximizar a deteção:
+ * - sender (title/subText da notificação Android)
+ * - appPackage (nome do pacote da app que originou, ex: com.vodacom.mpesa)
+ * - messageBody (conteúdo textual da mensagem)
+ *
+ * @param sender      - O campo title/subText da notificação Android (case-insensitive)
+ * @param appPackage  - O package name da app de origem (ex: "com.vodacom.mpesa")
+ * @param messageBody - O conteúdo de texto/bigText da notificação
  */
-export function isSourceAllowed(sender: string): boolean {
-  if (!sender) return false;
+export function isSourceAllowed(sender: string, appPackage?: string, messageBody?: string): boolean {
+  // Construir um único texto de contexto combinado para pesquisa
+  const parts: string[] = [];
+  if (sender) parts.push(sender);
+  if (appPackage) parts.push(appPackage);
+  if (messageBody) parts.push(messageBody);
+
+  if (parts.length === 0) return false;
+
+  const combinedLower = parts.join(' ').toLowerCase();
 
   const sources = _cachedSources ?? DEFAULT_NOTIFICATION_SOURCES;
-  const senderLower = sender.toLowerCase();
 
   return sources.some(
     (source) =>
       source.isEnabled &&
-      source.keywords.some((kw) => senderLower.includes(kw))
+      source.keywords.some((kw) => combinedLower.includes(kw))
   );
 }
 

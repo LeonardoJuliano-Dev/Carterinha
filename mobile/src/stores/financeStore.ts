@@ -54,6 +54,7 @@ import { startConnectivityMonitor, subscribeConnectivity, ConnectivityStatus, ge
 import { NotificationSource, loadNotificationSources, saveNotificationSources } from '../services/notificationSources';
 import { useJobQueueStore } from './jobQueueStore';
 import { formatCurrency, getCurrencySymbol } from '../utils/formatters';
+import { fireLocalNotification } from '../services/localNotificationService';
 
 // Security & persistence imports
 import * as SecureStore from 'expo-secure-store'; // for PIN hashing storage
@@ -543,6 +544,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
       set((state) => ({
         notifications: [newNotif, ...state.notifications],
       }));
+
+      // Notificação local visível na barra de estado Android
+      fireLocalNotification(
+        `${parsed.institution}: -${formatCurrency(parsed.amount, currencySymbol, true)}`,
+        `${parsed.storeOrRecipient} — ${parsed.isEssential ? 'Despesa Essencial' : 'Estilo de Vida'}`,
+      );
     } else if (parsed.type === 'income') {
       const day = new Date().getDate();
       const isSalaryWindow = day >= 25 || day <= 5;
@@ -587,6 +594,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           set((state) => ({
             notifications: [newNotif, ...state.notifications],
           }));
+
+          // Notificação local visível — salário detetado, pendente de confirmação
+          fireLocalNotification(
+            `💰 Salário Detetado (${parsed.institution})`,
+            `Recebeste ${formatCurrency(parsed.amount, currencySymbol)}. Abre a app para confirmar se é o teu salário.`,
+          );
         } else {
           // A partir do 3º mês: Atualiza automaticamente sem intervenção manual
           await get().registerSalary(parsed.amount);
@@ -608,6 +621,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           set((state) => ({
             notifications: [newNotif, ...state.notifications],
           }));
+
+          // Notificação local visível — salário atualizado automaticamente
+          fireLocalNotification(
+            `⚡ Salário Atualizado: ${formatCurrency(parsed.amount, currencySymbol)}`,
+            `Orçamento 50/30/20 recalculado automaticamente via ${parsed.institution}.`,
+          );
         }
       } else {
         // Entrada normal fora do intervalo de salário ou de outra instituição
@@ -676,7 +695,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         daysUntilDue = (daysInCurrentMonth - currentDay) + dueDay;
       }
 
-      if (daysUntilDue === 3) {
+      if (daysUntilDue > 0 && daysUntilDue <= 3) {
         const monthTag = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
         const alreadyNotified = notifications.some(
           (n) =>
@@ -686,11 +705,13 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         );
 
         if (!alreadyNotified) {
+          const title = `⏰ Lembrete: ${expense.name} vence em ${daysUntilDue} dia${daysUntilDue > 1 ? 's' : ''}`;
+          const body = `A tua despesa fixa "${expense.name}" no valor de ${formatCurrency(expense.amount, currencySymbol)} vence no dia ${dueDay}. Lembra-te de efetuar o pagamento!`;
           const notif: FinancialNotificationRecord = {
             id: `notif_due_${expense.id}_${Date.now()}`,
             institution: 'Outro',
-            title: `⏰ Lembrete: ${expense.name} vence em 3 dias`,
-            message: `A tua despesa fixa "${expense.name}" no valor de ${formatCurrency(expense.amount, currencySymbol)} vence no dia ${dueDay}. Lembra-te de efetuar o pagamento!`,
+            title,
+            message: body,
             amount: expense.amount,
             type: 'expense',
             tag: 'Lembrete',
@@ -704,6 +725,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           set((state) => ({
             notifications: [notif, ...state.notifications],
           }));
+
+          // Disparar notificação local visível na barra de estado do Android
+          fireLocalNotification(title, body, {
+            actionType: 'navigate_fixed_expenses',
+            actionPayload: expense.id,
+          });
         }
       }
     }
@@ -749,11 +776,13 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         if (!alreadyNotifiedEnd) {
           const prompt = `A minha meta "${goal.name}" está quase no fim${daysRemainingText}. O meu saldo atual nela é de ${formatCurrency(goal.current_amount, currencySymbol)} de ${formatCurrency(goal.target_amount, currencySymbol)}, restando apenas ${formatCurrency(remaining, currencySymbol)}. Como posso otimizar o meu orçamento ou cortar gastos supérfluos para alcançar essa meta com o consultor?`;
 
+          const title = `🚀 Quase lá: ${goal.name}`;
+          const body = `A tua meta "${goal.name}" está a chegar ao final${daysRemainingText}. Consulta como alcançar essa meta com o consultor!`;
           const notif: FinancialNotificationRecord = {
             id: `notif_goal_end_${goal.id}_${Date.now()}`,
             institution: 'Outro',
-            title: `🚀 Quase lá: ${goal.name}`,
-            message: `A tua meta "${goal.name}" está a chegar ao final${daysRemainingText}. Consulta como alcançar essa meta com o consultor!`,
+            title,
+            message: body,
             amount: remaining,
             type: 'transfer',
             tag: 'Metas',
@@ -768,6 +797,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           set((state) => ({
             notifications: [notif, ...state.notifications],
           }));
+
+          // Disparar notificação local visível na barra de estado
+          fireLocalNotification(title, body, {
+            actionType: 'navigate_advisor',
+            actionPayload: prompt,
+          });
         }
       }
 
@@ -785,11 +820,13 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         );
 
         if (!alreadyNotifiedStalled) {
+          const title = `🎯 Meta Parada: ${goal.name}`;
+          const body = `A tua meta "${goal.name}" está parada há algum tempo. Reserva um valor hoje para manter o teu objetivo vivo!`;
           const notif: FinancialNotificationRecord = {
             id: `notif_goal_stalled_${goal.id}_${Date.now()}`,
             institution: 'Outro',
-            title: `🎯 Meta Parada: ${goal.name}`,
-            message: `A tua meta "${goal.name}" está parada há algum tempo. Reserva um valor hoje para manter o teu objetivo vivo!`,
+            title,
+            message: body,
             amount: remaining,
             type: 'transfer',
             tag: 'Metas',
@@ -804,6 +841,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           set((state) => ({
             notifications: [notif, ...state.notifications],
           }));
+
+          // Disparar notificação local visível na barra de estado
+          fireLocalNotification(title, body, {
+            actionType: 'navigate_goals',
+            actionPayload: goal.id,
+          });
         }
       }
     }

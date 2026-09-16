@@ -159,6 +159,8 @@ export interface Translations {
   enableBiometrics: string;
   monthlyNetSalary: string;
   initialBalanceOptional: string;
+  otherBank: string;
+  enterBankName: string;
 
   // Modals & Forms
   modalTitleGoalNew: string;
@@ -733,6 +735,8 @@ export const translations: Record<SupportedLanguage, Translations> = {
     enableBiometrics: 'Ativar autenticação por Biometria',
     monthlyNetSalary: 'SALÁRIO LÍQUIDO MENSAL',
     initialBalanceOptional: 'SALDO INICIAL DA CARTEIRA (OPCIONAL)',
+    otherBank: 'Outro',
+    enterBankName: 'Introduza o nome do banco',
 
     modalTitleGoalNew: 'Nova Meta de Vida',
     modalTitleGoalEdit: 'Editar Meta de Vida',
@@ -1302,6 +1306,8 @@ export const translations: Record<SupportedLanguage, Translations> = {
     enableBiometrics: 'Enable Biometric Unlock',
     monthlyNetSalary: 'NET MONTHLY INCOME',
     initialBalanceOptional: 'STARTING BALANCE (OPTIONAL)',
+    otherBank: 'Other',
+    enterBankName: 'Enter bank name',
 
     modalTitleGoalNew: 'New Savings Goal',
     modalTitleGoalEdit: 'Edit Savings Goal',
